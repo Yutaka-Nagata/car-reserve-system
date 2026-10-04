@@ -1,0 +1,27 @@
+{
+  "bookable_max_period": 8,
+  "periods": {
+    "weekday": [
+      { "period": 1, "start": "09:10", "end": "10:00" },
+      { "period": 2, "start": "10:10", "end": "11:00" },
+      { "period": 3, "start": "11:10", "end": "12:00" },
+      { "period": 4, "start": "12:10", "end": "13:00" },
+      { "period": 5, "start": "13:10", "end": "14:00" },
+      { "period": 6, "start": "14:10", "end": "15:00" },
+      { "period": 7, "start": "16:00", "end": "16:50" },
+      { "period": 8, "start": "17:00", "end": "17:50" },
+      { "period": 9, "start": "18:00", "end": "18:50" },
+      { "period": 10, "start": "19:00", "end": "19:50" }
+    ],
+    "weekend": [
+      { "period": 1, "start": "09:10", "end": "10:00" },
+      { "period": 2, "start": "10:10", "end": "11:00" },
+      { "period": 3, "start": "11:10", "end": "12:00" },
+      { "period": 4, "start": "12:10", "end": "13:00" },
+      { "period": 5, "start": "14:00", "end": "14:50" },
+      { "period": 6, "start": "15:00", "end": "15:50" },
+      { "period": 7, "start": "16:00", "end": "16:50" },
+      { "period": 8, "start": "17:00", "end": "17:50" }
+    ]
+  }
+}
