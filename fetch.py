@@ -4,15 +4,17 @@ from urllib.parse import urlencode
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 from parse import parse_slots
+from config import configs
+
 
 load_dotenv()
 USER = os.environ["NCORS_USER"]
 PASS = os.environ["NCORS_PASS"]
-BASE_URL = os.environ["BASE_URL"]
-LOGIN_URL = os.environ["LOGIN_URL"]
-CARTYPE_URL = os.environ["CARTYPE_URL"]
-RESERVE_LIST_URL = os.environ["RESERVE_LIST_URL"]
-UA = os.environ["UA"]
+BASE_URL = configs["BASE_URL"]
+LOGIN_URL = configs["LOGIN_URL"]
+CARTYPE_URL = configs["CARTYPE_URL"]
+RESERVE_LIST_URL = configs["RESERVE_LIST_URL"]
+UA = configs["UA"]
 
 session = requests.Session()
 
@@ -51,21 +53,17 @@ def fetch_html(pre_res, pre_url, url, fields):
     return dump(post(f"{BASE_URL}{url}",body,f"{BASE_URL}{pre_url}"), url) 
 
 
-if __name__ == "__main__":
+def fetch_reserve_html() -> bytes:
     # ログインページを取得する
-    # ログインページにあるcookieを使い、ログイン先ペー時にアクセスする
+    # ログインページにあるcookieを使い、ログイン先ページにアクセスする
     res = dump(session.get(f"{BASE_URL}{LOGIN_URL}"), LOGIN_URL)
     res = fetch_html(res, LOGIN_URL, CARTYPE_URL, {"USERID": USER, "USERPASSWD": PASS})
+    assert USER in res.content.decode("cp932"), "ログイン失敗"
     res = fetch_html(res, CARTYPE_URL, RESERVE_LIST_URL, {"CARTYPE": "002"})
-    print(parse_slots(res.content))
+    return res.content
+    # for data in parse_slots(res.content):
+    #     print(f"{data["date"]}: {data["label"]}")
 
 
-    # fields = hiddens(res.content)
-    # fields.update({"USERID": USER, "USERPASSWD": PASS})
-    # res = dump(post(f"{BASE_URL}{CARTYPE_URL}",fields,f"{BASE_URL}{LOGIN_URL}"), "after_login") 
-    # fields = hiddens(res.content)
-    # fields.update({"CARTYPE": "002"})
-    # res = dump(post(f"{BASE_URL}{RESERVE_LIST_URL}",fields,f"{BASE_URL}{CARTYPE_URL}"), "reserve_list") 
-    # print(parse_slots(res.content))
-
-    # fetch_html(LOGIN_URL, {"USERID": USER, "USERPASSWD": PASS})
+if __name__ == "__main__":
+    print(parse_slots(fetch_reserve_html()))
