@@ -8,8 +8,6 @@ from config import configs
 
 
 load_dotenv()
-USER = os.environ["NCORS_USER"]
-PASS = os.environ["NCORS_PASS"]
 BASE_URL = configs["BASE_URL"]
 LOGIN_URL = configs["LOGIN_URL"]
 CARTYPE_URL = configs["CARTYPE_URL"]
@@ -54,6 +52,8 @@ def fetch_html(pre_res, pre_url, url, fields):
 
 
 def fetch_reserve_html() -> bytes:
+    USER = os.environ["NCORS_USER"]
+    PASS = os.environ["NCORS_PASS"]
     # ログインページを取得する
     # ログインページにあるcookieを使い、ログイン先ページにアクセスする
     res = dump(session.get(f"{BASE_URL}{LOGIN_URL}"), LOGIN_URL)
@@ -61,8 +61,6 @@ def fetch_reserve_html() -> bytes:
     assert USER in res.content.decode("cp932"), "ログイン失敗"
     res = fetch_html(res, CARTYPE_URL, RESERVE_LIST_URL, {"CARTYPE": "002"})
     return res.content
-    # for data in parse_slots(res.content):
-    #     print(f"{data["date"]}: {data["label"]}")
 
 
 if __name__ == "__main__":

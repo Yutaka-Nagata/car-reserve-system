@@ -23,7 +23,7 @@ def parse_slots(html_bytes):
 
 
 if __name__ == "__main__":
-    with open("samples/03_reserve_list.html", "rb") as f:
+    with open("samples/03_ReserveList.asp.html", "rb") as f:
         data = f.read()
     print(parse_slots(data))
 
