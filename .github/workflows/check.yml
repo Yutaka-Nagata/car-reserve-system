@@ -2,7 +2,7 @@ name: check-slots
 
 on:
   schedule:
-    - cron: "2 1-10 * * *"
+    - cron: "2 0-15 * * *"
   workflow_dispatch:
 
 permissions:
