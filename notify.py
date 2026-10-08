@@ -20,24 +20,25 @@ def build_message(slots):
         subject =  f"[教習空き] {len(slots)}件 / 最短 {parsed_slots[0]}"
         body = f"【教習所空きコマ通知システム】\n\n・現在の空きコマ\n{parse_text(parsed_slots)}\n予約 ➤ https://dk.ncors.com/min/ncors/login.asp\n"
     else:
-        subject = "[教習空き] 現在空きはありません"
-        body = "【教習所空きコマ通知システム】\n予約 ➤ https://dk.ncors.com/min/ncors/login.asp\n"
+        subject = ""
+        body = ""
     return subject, body
 
 
 def send(subject, body):
-    res = requests.post(
-        "https://api.resend.com/emails",
-        headers={"Authorization": f"Bearer {os.environ["RESEND_API_KEY"]}"},
-        json={
-            "from": "onboarding@resend.dev",
-            "to": [os.environ["TO_EMAIL"]],
-            "subject": subject,
-            "text": body,
-        },
+    if len(subject) > 0:
+        res = requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {os.environ["RESEND_API_KEY"]}"},
+            json={
+                "from": "onboarding@resend.dev",
+                "to": [os.environ["TO_EMAIL"]],
+                "subject": subject,
+                "text": body,
+            },
 
-    )
-    res.raise_for_status()
+        )
+        res.raise_for_status()
 
 
 if __name__ == "__main__":

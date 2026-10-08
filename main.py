@@ -5,8 +5,9 @@ from notify import send, build_message
 
 
 if __name__ == "__main__":
-    data = parse_data(parse_slots(fetch_reserve_html()))
-    get_differ(data)
-    subject, body = build_message(get_differ(data))
-    send(subject, body)
-    save_state(data)
+    filtered_free_data = parse_data([free_data for free_data in parse_slots(fetch_reserve_html()) if free_data["period"] not in [9,10]])
+    # 予約可能枠があればメール送信しつづけてほしいかも
+    if len(filtered_free_data) != 0:
+        subject, body = build_message(filtered_free_data)
+        send(subject, body)
+    save_state(filtered_free_data)
