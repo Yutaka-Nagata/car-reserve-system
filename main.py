@@ -11,5 +11,5 @@ if __name__ == "__main__":
         subject, body = build_message(filtered_free_data)
         send(subject, body)
     else:
-        send("空きはありません", "")
+        send("空きはありません", "空きはありません")
     save_state(filtered_free_data)
