@@ -12,7 +12,11 @@ name: check-slots
 
 on:
   schedule:
-    - cron: "7 0,3,6 * * *" # UTC。JST 9:07 / 12:07 / 15:07
+    # UTC。JST 9:07〜18:07 の毎時。
+    # GitHub は schedule を落とすので、数を増やして「どれか1本でも当たればいい」形にしている。
+    # 当たった1本が数時間ループし、残りは concurrency で待機→稼働時間外なら即終了になる。
+    # 待機は常に1本までで、新しいものが来ると古い待機は取り消されるので積み上がらない。
+    - cron: "7 0-9 * * *"
   workflow_dispatch:
     inputs:
       once:
