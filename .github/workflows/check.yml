@@ -1,24 +1,12 @@
 name: check-slots
 
-# GitHub の cron は起動時刻を保証しない（実測で平均42分遅れ、大半が実行されなかった）。
-# そこで「毎時起動する」のをやめ、「1日3回起動して、各回が数時間ループする」形にしている。
-# 起動が遅れても、ジョブが長く居座るので穴が空きにくい。
-#
-# concurrency で直列化されるため、3回の起動は実際には次のように連なる。
-#   1本目 9:07 起動 → 14:37 まで（MAX_RUNTIME_SEC で自分から終わる）
-#   2本目 12:07 分は待機 → 1本目の終了後に始まり、19:52 まで
-#   3本目 15:07 分は待機 → 稼働時間を過ぎているので即終了
-# 1本目が落とされても、2本目・3本目が残りを拾う。
-
 on:
   schedule:
-    - cron: "7 0,3,6 * * *" # UTC。JST 9:07 / 12:07 / 15:07
+    - cron: "2 0-15 * * *"
   workflow_dispatch:
-    inputs:
-      once:
-        description: "1回だけチェックして終了する（動作確認用。稼働時間外でも実行できる）"
-        type: boolean
-        default: false
+
+permissions:
+  contents: write
 
 concurrency:
   group: check-slots
@@ -27,24 +15,30 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    # 自前の MAX_RUNTIME_SEC（5.5時間）より少しだけ後ろに置く保険
-    timeout-minutes: 345
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          # f-string の入れ子クォートを使っているので 3.12 以上が必須
           python-version: "3.12"
           cache: pip
-
       - run: python -m pip install -r requirements.txt
 
-      - name: 空き枠を監視
+      - name: 空き枠をチェック
         env:
-          ONCE: ${{ inputs.once && '1' || '' }}
           NCORS_USER: ${{ secrets.NCORS_USER }}
           NCORS_PASS: ${{ secrets.NCORS_PASS }}
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           TO_EMAIL: ${{ secrets.TO_EMAIL }}
         run: python main.py
+
+      - name: state.jsonを更新
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add state.json
+          git diff --cached --quiet && exit 0
+          git commit -m "chore: 【定期実行】stateを更新"
+          git pull --rebase
+          git push
+          
+          
